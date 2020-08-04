@@ -21,3 +21,6 @@ build
 
 # Secre files
 **/*secret*
+
+# Code coverage reports
+coverage.*
