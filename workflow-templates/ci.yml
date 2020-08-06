@@ -37,12 +37,13 @@ jobs:
       - name: Set up runner environment
         run: ./.github/workflows/assets/utils.sh setup
         env:
-          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          GITHUB_USER: ${{ github.actor }}
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
 
       # If "vendor" is in cache, restore.
       # To run conditional steps use:
       # if: steps.vendor-cache.outputs.cache-hit != 'true'
-      - name: "Restore modules from cache"
+      - name: Restore modules from cache
         id: vendor-cache
         uses: actions/cache@v2
         env:
@@ -75,8 +76,9 @@ jobs:
             coverage.html
 
       # Populate vendor cache to speed up future runs
-      - name: "Populate vendor cache"
+      - name: Populate vendor cache
         run: go mod vendor
+
   # Runs when a tag is published if 'test' is successful.
   publish:
     name: publish package
