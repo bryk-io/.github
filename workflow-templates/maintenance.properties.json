@@ -1,7 +1,10 @@
 {
   "name": "Maintenance workflow",
   "description": "Common maintenance tasks for all projects.",
+  "iconName": "octicon clock",
   "categories": [
+    "Automation",
+    "SDLC",
     "Maintenance"
   ]
 }

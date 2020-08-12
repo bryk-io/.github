@@ -1,6 +1,7 @@
 {
   "name": "Publish tagged release",
   "description": "Create and publish a new release for Golang projects.",
+  "iconName": "go",
   "categories": [
     "Go"
   ]

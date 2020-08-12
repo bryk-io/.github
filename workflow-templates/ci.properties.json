@@ -1,6 +1,7 @@
 {
   "name": "Base Golang CI workflow",
   "description": "Common CI tasks for Golang projects.",
+  "iconName": "go",
   "categories": [
     "Go"
   ]
