@@ -1,7 +1,6 @@
 {
-  "name": "Publicsh tagged release",
+  "name": "Publish tagged release",
   "description": "Create and publish a new release for Golang projects.",
-  "iconName": "golang-gopher",
   "categories": [
     "Go"
   ]
