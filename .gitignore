@@ -24,3 +24,6 @@ build
 
 # Code coverage reports
 coverage.*
+
+# Releases
+dist
