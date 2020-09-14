@@ -20,7 +20,7 @@ LD_FLAGS += -X main.buildCode=$(GIT_COMMIT_HASH)
 
 # Proto builder basic setup
 proto-builder=docker run --rm -it -v $(shell pwd):/workdir \
-docker.pkg.github.com/bryk-io/base-images/buf-builder:0.20.5
+docker.pkg.github.com/bryk-io/base-images/buf-builder:0.23.0
 
 ## help: Prints this help message
 help:
