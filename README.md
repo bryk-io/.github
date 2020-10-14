@@ -7,3 +7,8 @@
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0-ff69b4.svg)](.github/CODE_OF_CONDUCT.md)
 
 Provide general description and additional details here...
+
+To prepare the repository:
+
+- Create a Personal Access Token with access to private repostories and the Github
+  container registry; add it as a secret `ACCESS_TOKEN`

@@ -3,24 +3,23 @@
 
 # Project setup
 BINARY_NAME=my-app
-DOCKER_IMAGE=docker.pkg.github.com/OWNER/REPO/BINARY_NAME
+DOCKER_IMAGE=ghcr.io/$(OWNER)/$(BINARY_NAME)
 MAINTAINERS='Ben Cessa <ben@pixative.com>'
 
 # State values
 GIT_COMMIT_DATE=$(shell TZ=UTC git log -n1 --pretty=format:'%cd' --date='format-local:%Y-%m-%dT%H:%M:%SZ')
 GIT_COMMIT_HASH=$(shell git log -n1 --pretty=format:'%H')
-GIT_TAG=$(shell git describe --tags --always --abbrev=0 | cut -c 1-8)
+GIT_TAG=$(shell git describe --tags --always --abbrev=0 | cut -c 1-7)
 
 # Linker tags
 # https://golang.org/cmd/link/
 LD_FLAGS += -s -w
-LD_FLAGS += -X main.coreVersion=$(GIT_TAG)
+LD_FLAGS += -X main.coreVersion=$(GIT_TAG:v%=%)
 LD_FLAGS += -X main.buildTimestamp=$(GIT_COMMIT_DATE)
 LD_FLAGS += -X main.buildCode=$(GIT_COMMIT_HASH)
 
 # Proto builder basic setup
-proto-builder=docker run --rm -it -v $(shell pwd):/workdir \
-docker.pkg.github.com/bryk-io/base-images/buf-builder:0.23.0
+proto-builder=docker run --rm -it -v $(shell pwd):/workdir ghcr.io/bryk-io/buf-builder:0.25.0
 
 ## help: Prints this help message
 help:
@@ -59,15 +58,16 @@ clean:
 # https://github.com/opencontainers/image-spec/blob/master/annotations.md
 docker:
 	make build-for os=linux arch=amd64
-	@-docker rmi $(DOCKER_IMAGE):$(GIT_TAG)
+	mv $(BINARY_NAME)_linux_amd64 $(BINARY_NAME)
+	@-docker rmi $(DOCKER_IMAGE):$(GIT_TAG:v%=%)
 	@docker build \
 	"--label=org.opencontainers.image.title=$(BINARY_NAME)" \
 	"--label=org.opencontainers.image.authors=$(MAINTAINERS)" \
 	"--label=org.opencontainers.image.created=$(GIT_COMMIT_DATE)" \
 	"--label=org.opencontainers.image.revision=$(GIT_COMMIT_HASH)" \
-	"--label=org.opencontainers.image.version=$(GIT_TAG)" \
-	--rm -t $(DOCKER_IMAGE):$(GIT_TAG) .
-	@rm $(BINARY_NAME)_linux_amd64
+	"--label=org.opencontainers.image.version=$(GIT_TAG:v%=%)" \
+	--rm -t $(DOCKER_IMAGE):$(GIT_TAG:v%=%) .
+	@rm $(BINARY_NAME)
 
 ## install: Install the binary to GOPATH and keep cached all compiled artifacts
 install:
@@ -98,7 +98,6 @@ proto:
 	--go-grpc_out=proto \
 	--grpc-gateway_out=logtostderr=true:proto \
 	--swagger_out=logtostderr=true:proto \
-	--govalidators_out=proto \
 	proto/v1/*.proto
 
 	# Remove package comment added by the gateway generator to avoid polluting

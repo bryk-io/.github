@@ -1,0 +1,9 @@
+{
+  "name": "CodeQL Scanning",
+  "description": "Code scanning using the CodeQL engine.",
+  "iconName": "go",
+  "categories": [
+    "Go",
+    "Security"
+  ]
+}
