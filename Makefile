@@ -19,7 +19,7 @@ LD_FLAGS += -X main.buildTimestamp=$(GIT_COMMIT_DATE)
 LD_FLAGS += -X main.buildCode=$(GIT_COMMIT_HASH)
 
 # Proto builder basic setup
-proto-builder=docker run --rm -it -v $(shell pwd):/workdir ghcr.io/bryk-io/buf-builder:0.25.0
+proto-builder=docker run --rm -it -v $(shell pwd):/workdir ghcr.io/bryk-io/buf-builder:0.30.0
 
 ## help: Prints this help message
 help:

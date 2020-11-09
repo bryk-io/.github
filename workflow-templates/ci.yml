@@ -61,9 +61,9 @@ jobs:
       # Style consistency and static analysis using 'golangci-lint'
       # https://github.com/marketplace/actions/run-golangci-lint
       - name: Static analysis
-        uses: golangci/golangci-lint-action@v2.2.1
+        uses: golangci/golangci-lint-action@v2
         with:
-          version: v1.31
+          version: v1.32
 
       # Run unit tests
       - name: Test
