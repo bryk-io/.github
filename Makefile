@@ -4,7 +4,7 @@
 # Project setup
 BINARY_NAME=my-app
 DOCKER_IMAGE=ghcr.io/$(OWNER)/$(BINARY_NAME)
-MAINTAINERS='Ben Cessa <ben@pixative.com>'
+MAINTAINERS=''
 
 # State values
 GIT_COMMIT_DATE=$(shell TZ=UTC git log -n1 --pretty=format:'%cd' --date='format-local:%Y-%m-%dT%H:%M:%SZ')
@@ -19,7 +19,7 @@ LD_FLAGS += -X main.buildTimestamp=$(GIT_COMMIT_DATE)
 LD_FLAGS += -X main.buildCode=$(GIT_COMMIT_HASH)
 
 # Proto builder basic setup
-proto-builder=docker run --rm -it -v $(shell pwd):/workdir ghcr.io/bryk-io/buf-builder:0.30.0
+proto-builder=docker run --rm -it -v $(shell pwd):/workdir ghcr.io/bryk-io/buf-builder:0.40.0
 
 ## help: Prints this help message
 help:
@@ -80,16 +80,14 @@ lint:
 ## proto: Compile all PB definitions and RPC services
 proto:
 	# Verify style and consistency
-	$(proto-builder) buf check lint --file $(shell echo proto/v1/*.proto | tr ' ' ',')
-	@-$(proto-builder) buf check breaking \
-	--file $(shell echo proto/v1/*.proto | tr ' ' ',') \
-	--against-input proto/v1/image.bin
+	$(proto-builder) buf lint --path proto/$(pkg)
 
-	# Clean old builds
-	@-rm proto/v1/image.bin
+	# Verify breaking changes. This fails if no image is already present,
+	# use `buf build --o proto/$(pkg)/image.bin --path proto/$(pkg)` to generate it.
+	$(proto-builder) buf breaking --against proto/$(pkg)/image.bin
 
 	# Build package image
-	$(proto-builder) buf image build -o proto/v1/image.bin --file $(shell echo proto/v1/*.proto | tr ' ' ',')
+	$(proto-builder) buf build --output proto/$(pkg)/image.bin --path proto/$(pkg)
 
 	# Build package code
 	$(proto-builder) buf protoc \
@@ -98,15 +96,20 @@ proto:
 	--go-grpc_out=proto \
 	--grpc-gateway_out=logtostderr=true:proto \
 	--swagger_out=logtostderr=true:proto \
-	proto/v1/*.proto
+	--validate_out=lang=go:proto \
+	proto/$(pkg)/*.proto
 
 	# Remove package comment added by the gateway generator to avoid polluting
 	# the package documentation.
-	@-sed -i '' '/\/\*/,/*\//d' proto/v1/*.pb.gw.go
+	@-sed -i '' '/\/\*/,/*\//d' proto/$(pkg)/*.pb.gw.go
 
-	# Style adjustments
-	gofmt -s -w proto/v1
-	goimports -w proto/v1
+	# Remove non-required dependencies. "protoc-gen-validate" don't have runtime
+	# dependencies but the generated code includes the package by the default =/.
+	@-sed -i '' '/protoc-gen-validate/d' proto/$(pkg)/*.pb.go
+
+	# Style adjustments (required for consistency)
+	gofmt -s -w proto/$(pkg)
+	goimports -w proto/$(pkg)
 
 ## release: Prepare artifacts for a new tagged release
 release:

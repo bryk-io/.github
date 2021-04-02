@@ -39,7 +39,6 @@ linters:
     - nakedret
     - prealloc
     - gosec
-    - scopelint
     - bodyclose
     - stylecheck
     - unparam
@@ -48,13 +47,12 @@ linters:
     - asciicheck
     - errorlint
     - exhaustive
-    - exportloopref
     - forcetypeassert
     - godot
     - ifshort
     - noctx
     - predeclared
-    - scopelint
+    - exportloopref
     - wastedassign
     - whitespace
     #- wrapcheck
@@ -75,7 +73,6 @@ issues:
         - gosec
         - lll
         - nakedret
-        - scopelint
         - funlen
         - nestif
         - noctx

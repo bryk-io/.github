@@ -19,8 +19,6 @@ jobs:
       # Checkout code
       - name: Checkout repository
         uses: actions/checkout@v2
-        with:
-          fetch-depth: 2
       
       # Prepare runner environment
       - name: Set up runner environment

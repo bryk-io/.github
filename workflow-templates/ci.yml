@@ -2,7 +2,9 @@ name: ci
 on:
   push:
     branches:
-      - '*'
+      - master
+    tags:
+      - v*
   pull_request:
     branches:
       - master
@@ -18,20 +20,22 @@ jobs:
   # Can also be executed manually.
   test:
     name: code quality and correctness
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: [1.15.x, 1.16.x]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 10
     steps:
-      # Go 1.15
-      - name: Set up Go 1.15
+      # Go
+      - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: ^1.15
+          go-version: ${{ matrix.go-version }}
 
       # Checkout code
       - name: Checkout repository
         uses: actions/checkout@v2
-        with:
-          fetch-depth: 2
 
       # If this run was triggered by a pull request event, then checkout
       # the head of the pull request instead of the merge commit.
