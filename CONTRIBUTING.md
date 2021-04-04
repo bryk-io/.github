@@ -13,14 +13,15 @@ your issue, assessing changes, and helping you finalize your pull requests.
 
 We take our community seriously and hold ourselves and other contributors
 to high standards of communication. By participating and contributing to
-this project, you agree to uphold our [Code of Conduct](.github/CODE_OF_CONDUCT.md).
+this project, you agree to uphold our [Code of Conduct](./CODE_OF_CONDUCT.md).
 
 ## Getting Started
 
 Contributions are made to this repo via Issues and Pull Requests (PRs).
 A few general guidelines that cover both:
 
-- To report security vulnerabilities, please use our [Responsible Disclosure Program](.github/SECURITY.md) which is monitored by our security team.
+- To report security vulnerabilities, please use our [Responsible Disclosure Program](./SECURITY.md)
+which is monitored by our security team.
 - Search for existing Issues and PRs before creating your own.
 - We work hard to makes sure issues are handled in a timely manner but,
 depending on the impact, it could take a while to investigate the root cause.
@@ -37,9 +38,9 @@ you request.
 
 If you find an Issue that addresses the problem you're having, please add
 your own reproduction information to the existing issue rather than creating
-a new one. Adding a [reaction](https://github.blog/2016-03-10-add-reactions-to-pull-requests-issues-and-comments/) can also help
-by indicating to our maintainers that a particular problem is affecting more
-than just the reporter.
+a new one. Adding a [reaction](https://github.blog/2016-03-10-add-reactions-to-pull-requests-issues-and-comments/)
+can also help by indicating to our maintainers that a particular problem is affecting
+more than just the reporter.
 
 ## Pull Requests
 
