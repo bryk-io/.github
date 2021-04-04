@@ -17,4 +17,4 @@ Before you submit a pull request, please make sure of the following.
 - [ ] Your code should contain tests relevant for the problem you are solving
 - [ ] Extend or adjust the documentation, if necessary
 - [ ] All commit messages are properly formatted and descriptive
-- [ ] Code complies with exinting style guides
+- [ ] Code complies with existing style guides
