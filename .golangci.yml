@@ -24,7 +24,7 @@ linters:
     - errcheck
     - gosimple
     - govet
-    - golint
+    - revive
     - gofmt
     - ineffassign
     - staticcheck
@@ -100,8 +100,6 @@ linters-settings:
       - unusedresult
       - tests
       #- fieldalignment
-  golint:
-    min-confidence: 0.8
   gofmt:
     simplify: true
   gocyclo:

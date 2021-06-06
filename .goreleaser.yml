@@ -62,18 +62,15 @@ snapshot:
 # https://goreleaser.com/customization/docker/
 dockers:
   -
+    # Build IDs to gather the binaries from
+    ids:
+      - my-app
     # GOOS of the built binary that should be used
     goos: linux
     # GOARCH of the built binary that should be used
     goarch: amd64
     # Dockerfile location
     dockerfile: Dockerfile
-    # Binaries that should be used
-    binaries:
-      - my-app
-    # Build IDs to gather the binaries from
-    builds:
-      - my-app
     # OCI image tags
     build_flag_templates:
       - "--pull"
@@ -81,6 +78,7 @@ dockers:
       - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
       - "--label=org.opencontainers.image.version={{ .Version }}"
       - "--label=org.opencontainers.image.created={{ .CommitDate }}"
+      - "--label=org.opencontainers.image.source=https://github.com/bryk-io/{{ .ProjectName }}"
     # Skips the docker push if there is an indicator for prerelease
     # in the tag e.g. v1.0.0-rc1 (auto)
     skip_push: true

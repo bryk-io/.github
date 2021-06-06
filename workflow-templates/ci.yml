@@ -37,12 +37,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # If this run was triggered by a pull request event, then checkout
-      # the head of the pull request instead of the merge commit.
-      - name: Checkout pull request head
-        if: ${{ github.event_name == 'pull_request' }}
-        run: git checkout HEAD^2
-
       # Prepare runner environment
       - name: Set up runner environment
         run: ./.github/workflows/assets/utils.sh setup
@@ -55,7 +49,7 @@ jobs:
       # if: steps.vendor-cache.outputs.cache-hit != 'true'
       - name: Restore vendor from cache
         id: vendor-cache
-        uses: actions/cache@v2.1.4
+        uses: actions/cache@v2.1.6
         env:
           cache-name: vendor
         with:
@@ -65,9 +59,9 @@ jobs:
       # Style consistency and static analysis using 'golangci-lint'
       # https://github.com/marketplace/actions/run-golangci-lint
       - name: Static analysis
-        uses: golangci/golangci-lint-action@v2.5.1
+        uses: golangci/golangci-lint-action@v2.5.2
         with:
-          version: v1.38
+          version: latest
 
       # Run unit tests
       - name: Test

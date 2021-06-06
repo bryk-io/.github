@@ -2,6 +2,7 @@
 .DEFAULT_GOAL := help
 
 # Project setup
+PROJECT_REPO=https://github.com/bryk-io/my-app
 BINARY_NAME=my-app
 DOCKER_IMAGE=ghcr.io/$(OWNER)/$(BINARY_NAME)
 MAINTAINERS=''
@@ -66,6 +67,7 @@ docker:
 	"--label=org.opencontainers.image.created=$(GIT_COMMIT_DATE)" \
 	"--label=org.opencontainers.image.revision=$(GIT_COMMIT_HASH)" \
 	"--label=org.opencontainers.image.version=$(GIT_TAG:v%=%)" \
+	"--label=org.opencontainers.image.source=$(PROJECT_REPO)" \
 	--rm -t $(DOCKER_IMAGE):$(GIT_TAG:v%=%) .
 	@rm $(BINARY_NAME)
 
@@ -118,7 +120,7 @@ release:
 ## scan: Look for known vulnerabilities in the project dependencies
 # https://github.com/sonatype-nexus-community/nancy
 scan:
-	@go list -f '{{if not .Indirect}}{{.}}{{end}}' -mod=mod -m all | nancy sleuth -o text
+	@go list -f '{{if not .Indirect}}{{.}}{{end}}' -m all | nancy sleuth --skip-update-check
 
 ## test: Run unit tests excluding the vendor dependencies
 test:
