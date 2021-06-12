@@ -2,9 +2,10 @@
 .DEFAULT_GOAL := help
 
 # Project setup
-PROJECT_REPO=https://github.com/bryk-io/my-app
 BINARY_NAME=my-app
+OWNER=bryk-io
 DOCKER_IMAGE=ghcr.io/$(OWNER)/$(BINARY_NAME)
+PROJECT_REPO=https://github.com/$(OWNER)/$(BINARY_NAME)
 MAINTAINERS=''
 
 # State values
@@ -19,8 +20,12 @@ LD_FLAGS += -X main.coreVersion=$(GIT_TAG:v%=%)
 LD_FLAGS += -X main.buildTimestamp=$(GIT_COMMIT_DATE)
 LD_FLAGS += -X main.buildCode=$(GIT_COMMIT_HASH)
 
-# Proto builder basic setup
-proto-builder=docker run --rm -it -v $(shell pwd):/workdir ghcr.io/bryk-io/buf-builder:0.40.0
+# "buf" is used to manage protocol buffer definitions, either
+# locally (on a dev container) or using a builder image.
+buf:=buf
+ifndef REMOTE_CONTAINERS_SOCKETS
+	buf=docker run --rm -it -v $(shell pwd):/workdir ghcr.io/bryk-io/buf-builder:0.43.2 buf
+endif
 
 ## help: Prints this help message
 help:
@@ -55,6 +60,11 @@ deps:
 	go mod download
 	go mod vendor
 
+## docs: Display package documentation on local server
+docs:
+	@echo "Docs available at: http://localhost:8080/"
+	godoc -http=:8080 -goroot=${GOPATH} -play
+
 ## docker: Build docker image
 # https://github.com/opencontainers/image-spec/blob/master/annotations.md
 docker:
@@ -79,35 +89,36 @@ install:
 lint:
 	golangci-lint run -v ./...
 
-## proto: Compile all PB definitions and RPC services
-proto:
+## proto-test: Verify PB definitions on 'pkg'
+proto-test:
 	# Verify style and consistency
-	$(proto-builder) buf lint --path proto/$(pkg)
+	$(buf) lint --path proto/$(pkg)
 
 	# Verify breaking changes. This fails if no image is already present,
 	# use `buf build --o proto/$(pkg)/image.bin --path proto/$(pkg)` to generate it.
-	$(proto-builder) buf breaking --against proto/$(pkg)/image.bin
+	$(buf) breaking --against proto/$(pkg)/image.bin
+
+## proto: Build PB definitions on 'pkg'
+proto:
+	# Verify PB definitions
+	make proto-test pkg=$(pkg)
 
 	# Build package image
-	$(proto-builder) buf build --output proto/$(pkg)/image.bin --path proto/$(pkg)
+	$(buf) build --output proto/$(pkg)/image.bin --path proto/$(pkg)
 
-	# Build package code
-	$(proto-builder) buf protoc \
-	--proto_path=proto \
-	--go_out=proto \
-	--go-grpc_out=proto \
-	--grpc-gateway_out=logtostderr=true:proto \
-	--swagger_out=logtostderr=true:proto \
-	--validate_out=lang=go:proto \
-	proto/$(pkg)/*.proto
+	# Generate package code using buf.gen.yaml
+	$(buf) generate --output proto --path proto/$(pkg)
 
 	# Remove package comment added by the gateway generator to avoid polluting
 	# the package documentation.
-	@-sed -i '' '/\/\*/,/*\//d' proto/$(pkg)/*.pb.gw.go
+	@-sed -i.bak '/\/\*/,/*\//d' proto/$(pkg)/*.pb.gw.go
 
 	# Remove non-required dependencies. "protoc-gen-validate" don't have runtime
 	# dependencies but the generated code includes the package by the default =/.
-	@-sed -i '' '/protoc-gen-validate/d' proto/$(pkg)/*.pb.go
+	@-sed -i.bak '/protoc-gen-validate/d' proto/$(pkg)/*.pb.go
+
+	# Remove in-place edit backup files
+	@-rm proto/$(pkg)/*.bak
 
 	# Style adjustments (required for consistency)
 	gofmt -s -w proto/$(pkg)
@@ -115,7 +126,7 @@ proto:
 
 ## release: Prepare artifacts for a new tagged release
 release:
-	goreleaser release --skip-validate --skip-publish --rm-dist
+	goreleaser release --rm-dist --skip-validate --skip-publish
 
 ## scan: Look for known vulnerabilities in the project dependencies
 # https://github.com/sonatype-nexus-community/nancy

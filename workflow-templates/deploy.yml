@@ -1,0 +1,38 @@
+name: deploy
+on:
+  # To manually deploy the workflow. For example, using CLI:
+  # gh workflow run deploy -f name=my-app -f namespace=dev
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'Deployment name'
+        required: true
+        default: 'my-app'
+      namespace:
+        description: 'Kubernetes namespace'
+        required: true
+      version:
+        description: 'Application version to deploy (used as image tag)'
+        required: false
+        default: ''
+jobs:
+  deploy:
+    name: run deployment
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      # Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      
+      # Deploy chart
+      # https://github.com/bryk-io/chart-deploy-action#without-environments
+      - name: Helm chart deployment
+        uses: bryk-io/chart-deploy-action@v1.0.0
+        with:
+          name: ${{ github.event.inputs.name }}
+          namespace: ${{ github.event.inputs.namespace }}
+          version: ${{ github.event.inputs.version }}
+        env:
+          KUBECTL_CONFIG: ${{ secrets[format('kubectl_config_{0}', github.event.inputs.namespace)] }}
+          CHART_VALUES: ${{ secrets[format('chart_values_{0}', github.event.inputs.namespace)] }}

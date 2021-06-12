@@ -10,7 +10,7 @@ Provide general description and additional details here...
 
 To prepare the repository:
 
-- Create a Personal Access Token with access to private repostories and the Github
+- Create a Personal Access Token with access to private repositories and the Github
   container registry; add it as a secret `ACCESS_TOKEN`
 
 ## Cryptography Notice

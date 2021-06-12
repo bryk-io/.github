@@ -22,8 +22,12 @@ build
 # Secre files
 **/*secret*
 
+# Local and temporary files
+/local
+/tmp
+
 # Code coverage reports
 coverage.*
 
 # Releases
-dist
+/dist

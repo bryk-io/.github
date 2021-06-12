@@ -1,8 +1,8 @@
-name: release
+name: publish
 on:
   push:
     tags:
-      - '*'
+      - *
 jobs:
   # Publish project package(s)
   publish:
@@ -20,6 +20,9 @@ jobs:
       # Checkout code
       - name: Checkout repository
         uses: actions/checkout@v2
+        # This is required for the changelog to be properly generated
+        with:
+          fetch-depth: 0
 
       # Prepare runner environment
       - name: Set up runner environment
@@ -39,10 +42,6 @@ jobs:
         with:
           path: ./vendor
           key: ${{ env.cache-name }}-${{ hashFiles('go.sum') }}
-
-      # Ensure project compile and build successfully
-      - name: Build
-        run: make build-for os=linux arch=amd64
 
       # Use goreleaser to create the new release
       # https://github.com/goreleaser/goreleaser-action

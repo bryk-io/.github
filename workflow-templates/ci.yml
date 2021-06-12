@@ -2,12 +2,12 @@ name: ci
 on:
   push:
     branches:
-      - master
+      - $default-branch
     tags:
       - v*
   pull_request:
     branches:
-      - master
+      - $default-branch
   workflow_dispatch: {}
 #    Inputs are available under: github.event.inputs.{name}
 #    inputs:
@@ -15,6 +15,7 @@ on:
 #        description: 'Variable description'
 #        required: true
 #        default: 'default value here'
+# https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_dispatch
 jobs:
   # Runs on every push and pull request on the selected branches.
   # Can also be executed manually.
