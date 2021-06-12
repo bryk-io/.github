@@ -1,5 +1,11 @@
 {
   "name": "Manual deployment",
   "description": "Manually deploy a Helm based project.",
-  "iconName": "kubernetes"
+  "iconName": "kubernetes",
+  "categories": [
+    "Automation",
+    "Deployment",
+    "Kubernetes",
+    "Helm"
+  ]
 }
