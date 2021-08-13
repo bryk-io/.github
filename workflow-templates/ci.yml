@@ -2,12 +2,12 @@ name: ci
 on:
   push:
     branches:
-      - $default-branch
+      - master
     tags:
       - v*
   pull_request:
     branches:
-      - $default-branch
+      - master
   workflow_dispatch: {}
 #    Inputs are available under: github.event.inputs.{name}
 #    inputs:
@@ -17,10 +17,59 @@ on:
 #        default: 'default value here'
 # https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_dispatch
 jobs:
+  # Validate the protocol buffer definitions on the project
+  # using 'buf'. Remove if not required.
+  protos:
+    name: validate protobuf definitions
+    runs-on: ubuntu-latest
+    steps:
+      # Go
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16.x
+
+      # Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Configure runner environment
+      - name: Set up runner environment
+        run: ./.github/workflows/assets/utils.sh setup
+        env:
+          GITHUB_USER: ${{ github.actor }}
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+
+      # Setup buf
+      - name: Setup buf
+        id: setup-buf
+        uses: bufbuild/buf-setup-action@v0.2.0
+        with:
+          version: '0.43.2'
+
+      # Static analysis
+      - name: Static analysis
+        uses: bufbuild/buf-lint-action@v0.2.0
+        if: ${{ steps.setup-buf.outcome == 'success' }}
+        with:
+          github_token: ${{ github.token }}
+
+      # Detect breaking changes
+      - name: Detect breaking changes
+        uses: bufbuild/buf-breaking-action@v0.2.0
+        if: ${{ steps.setup-buf.outcome == 'success' }}
+        with:
+          against: 'https://github.com/${{ github.repository }}.git#branch=master'
+          github_token: ${{ github.token }}
+        env:
+          BUF_INPUT_HTTPS_USERNAME: ${{ github.actor }}
+          BUF_INPUT_HTTPS_PASSWORD: ${{ secrets.ACCESS_TOKEN }}
+
   # Runs on every push and pull request on the selected branches.
   # Can also be executed manually.
   test:
     name: code quality and correctness
+    needs: protos
     strategy:
       matrix:
         go-version: [1.15.x, 1.16.x]

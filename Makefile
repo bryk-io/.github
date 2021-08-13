@@ -27,7 +27,6 @@ ifndef REMOTE_CONTAINERS_SOCKETS
 	buf=docker run --rm -it -v $(shell pwd):/workdir ghcr.io/bryk-io/buf-builder:0.43.2 buf
 endif
 
-## help: Prints this help message
 help:
 	@echo "Commands available"
 	@sed -n 's/^##//p' ${MAKEFILE_LIST} | column -t -s ':' | sed -e 's/^/ /' | sort
@@ -141,4 +140,4 @@ test:
 ## updates: List available updates for direct dependencies
 # https://github.com/golang/go/wiki/Modules#how-to-upgrade-and-downgrade-dependencies
 updates:
-	@go list -u -f '{{if (and (not (or .Main .Indirect)) .Update)}}{{.Path}}: {{.Version}} -> {{.Update.Version}}{{end}}' -m all 2> /dev/null
+	@go list -u -f '{{if (and (not (or .Main .Indirect)) .Update)}}{{.Path}}: {{.Version}} -> {{.Update.Version}}{{end}}' -mod=mod -m all 2> /dev/null

@@ -92,10 +92,7 @@ dockers:
 # https://goreleaser.com/customization/release/#customize-the-changelog
 changelog:
   # Sorts the changelog by the commit's messages (asc, desc or '')
-  sort: asc
-  # If set to auto, will mark the release as not ready for production
-  # in case there is an indicator for this in the tag e.g. v1.0.0-rc1
-  prerelease: auto
+  sort: ''
   # Remove certain commit messages from the changelog
   filters:
     # Standard commit messages can help to produce better changelogs

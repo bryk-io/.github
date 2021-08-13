@@ -26,7 +26,8 @@ coordinates the fix and release process.
 4. If it is determined, in consultation with the submitter, that a CVE-ID is required,
 the primary handler will obtain one.
 
-5. Fixes are prepared for, at least, the two most recent major releases and the head/master revision.
+5. Fixes are prepared for, at least, the two most recent major releases and the head/master
+revision.
 
 This process can take some time, especially when coordination is required with maintainers
 of other projects. Every effort will be made to handle the bug in as timely a manner as possible,

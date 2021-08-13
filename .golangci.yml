@@ -55,12 +55,12 @@ linters:
     - exportloopref
     - wastedassign
     - whitespace
-    #- wrapcheck
-    #- nestif
-    #- funlen
-  disable:
+    - funlen
+    - nestif
     - deadcode
     - unused
+    #- wrapcheck
+  disable:
     - dupl
 issues:
   exclude-use-default: false
@@ -87,7 +87,6 @@ linters-settings:
       - atomicalign
       - buildtag
       - cgocall
-      - composites
       - copylocks
       - httpresponse
       - loopclosure
@@ -100,6 +99,7 @@ linters-settings:
       - unusedresult
       - tests
       #- fieldalignment
+      #- composites
   gofmt:
     simplify: true
   gocyclo:
@@ -124,9 +124,9 @@ linters-settings:
     range-loops: true
     for-loops: false
   dupl:
-    threshold: 150
+    threshold: 110
   exhaustive:
     default-signifies-exhaustive: true
   funlen:
-    lines: 90
+    lines: 120
     statements: 70
