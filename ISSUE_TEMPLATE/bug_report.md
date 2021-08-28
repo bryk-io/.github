@@ -7,11 +7,13 @@ assignees: ''
 
 ---
 
-**Describe the bug**
+# :bug: Bug Report
+
 A clear and concise description of what the bug is.
 
 **To Reproduce**
 Steps to reproduce the behavior:
+
 1. Go to '...'
 2. Click on '....'
 3. Scroll down to '....'
@@ -24,9 +26,10 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Environment (please complete the following information):**
- - OS: [e.g. MacOS 10.15.6]
- - Browser [e.g. chrome, safari]
- - Application version [e.g. 0.5.2]
+
+- OS: [e.g. MacOS 10.15.6]
+- Browser [e.g. chrome, safari]
+- Application version [e.g. 0.5.2]
 
 **Additional context**
 Add any other context about the problem here.

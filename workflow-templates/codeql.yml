@@ -8,6 +8,9 @@ on:
       - master
   workflow_dispatch: {}
 jobs:
+  # Semantic code analysis to discover vulnerabilities in the codebase
+  # using GitHub's CodeQL.
+  # https://codeql.github.com/docs/
   analyze:
     name: analyze
     runs-on: ubuntu-latest
