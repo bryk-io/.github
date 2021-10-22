@@ -24,7 +24,7 @@ LD_FLAGS += -X main.buildCode=$(GIT_COMMIT_HASH)
 # locally (on a dev container) or using a builder image.
 buf:=buf
 ifndef REMOTE_CONTAINERS_SOCKETS
-	buf=docker run --rm -it -v $(shell pwd):/workdir ghcr.io/bryk-io/buf-builder:0.43.2 buf
+	buf=docker run --rm -it -v $(shell pwd):/workdir ghcr.io/bryk-io/buf-builder:1.0.0-rc1 buf
 endif
 
 help:
@@ -97,8 +97,8 @@ proto-test:
 	# use `buf build --o proto/$(pkg)/image.bin --path proto/$(pkg)` to generate it.
 	$(buf) breaking --against proto/$(pkg)/image.bin
 
-## proto: Build PB definitions on 'pkg'
-proto:
+## proto-build: Build PB definitions on 'pkg'
+proto-build:
 	# Verify PB definitions
 	make proto-test pkg=$(pkg)
 
