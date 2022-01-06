@@ -16,7 +16,12 @@
   "postCreateCommand": "./.devcontainer/post-create.sh",
   "remoteUser": "vscode",
   "settings": {
-    "terminal.integrated.shell.linux": "/bin/bash",
+    "terminal.integrated.profiles.linux": {
+      "default-shell": {
+        "path": "/bin/bash"
+      }
+    },
+    "terminal.integrated.defaultProfile.linux": "default-shell",
     "workbench.iconTheme" : "eq-material-theme-icons-light",
     "go.toolsManagement.checkForUpdates": "local",
     "go.useLanguageServer": true,
@@ -29,10 +34,18 @@
     },
   },
   "extensions": [
+    // Custom fileicons theme
+    // "equinusocio.vsc-material-theme-icons",
+    // GoLang support
     "golang.Go",
-    "equinusocio.vsc-material-theme-icons",
+    // API client tools (similar to Postman)
     "rangav.vscode-thunder-client",
-    "zxh404.vscode-proto3"
+    // Protobuf support
+    "zxh404.vscode-proto3",
+    // Task explorer panel
+    "spmeesseman.vscode-taskexplorer",
+    // Live share for remote collaboration
+    "ms-vsliveshare.vsliveshare"
   ],
   "forwardPorts": []
 }

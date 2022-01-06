@@ -35,6 +35,22 @@ RUN \
   chmod +x /usr/local/bin/protoc && \
   rm -rf /tmp/protoc
 
+# protoc plugins
+ARG PROTOC_GRPC_GATEWAY="1.16.0"
+ARG PROTOC_GEN_GO_GRPC="1.1.0"
+ARG PROTOC_GEN_VALIDATE="0.6.1"
+ARG PROTOC_GEN_GO="1.27.1"
+ARG PROTOC_GEN_DRPC="0.0.26"
+ARG PROTOC_GEN_ENT="0.1.0"
+RUN \
+  su vscode -c "go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway@v${PROTOC_GRPC_GATEWAY}" && \
+  su vscode -c "go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger@v${PROTOC_GRPC_GATEWAY}" && \
+  su vscode -c "go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v${PROTOC_GEN_GO_GRPC}" && \
+  su vscode -c "go install github.com/envoyproxy/protoc-gen-validate@v${PROTOC_GEN_VALIDATE}" && \
+  su vscode -c "go install google.golang.org/protobuf/cmd/protoc-gen-go@v${PROTOC_GEN_GO}" && \
+  su vscode -c "go install storj.io/drpc/cmd/protoc-gen-go-drpc@v${PROTOC_GEN_DRPC}" && \
+  su vscode -c "go install entgo.io/contrib/entproto/cmd/protoc-gen-ent@v${PROTOC_GEN_ENT}"
+
 # buf
 ARG BUF_VERSION="1.0.0-rc1"
 RUN \
@@ -59,40 +75,31 @@ RUN \
   chmod +x ghz* && \
   mv ghz* /usr/local/bin/.
 
-# protoc-gen-grpc-gateway
-ARG GRPC_GATEWAY_VERSION="1.16.0"
-RUN \
-  curl -sSL \
-  https://github.com/grpc-ecosystem/grpc-gateway/releases/download/v${GRPC_GATEWAY_VERSION}/protoc-gen-grpc-gateway-v${GRPC_GATEWAY_VERSION}-linux-x86_64 \
-  -o ${GOPATH}/bin/protoc-gen-grpc-gateway && \
-  curl -sSL \
-  https://github.com/grpc-ecosystem/grpc-gateway/releases/download/v${GRPC_GATEWAY_VERSION}/protoc-gen-swagger-v${GRPC_GATEWAY_VERSION}-linux-x86_64 \
-  -o ${GOPATH}/bin/protoc-gen-swagger && \
-  chmod +x ${GOPATH}/bin/protoc-gen-grpc-gateway && \
-  chmod +x ${GOPATH}/bin/protoc-gen-swagger
-  # su vscode -c "go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway@v${GRPC_GATEWAY_VERSION}" && \
-  # su vscode -c "go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger@v${GRPC_GATEWAY_VERSION}"
-
-# protoc plugins and additional tools
-ARG PROTOC_GEN_GO_GRPC="1.1.0"
-ARG PROTOC_GEN_VALIDATE="0.6.1"
-ARG PROTOC_GEN_GO="1.27.1"
-ARG PROTOC_GEN_DRPC=0.0.26
+# helm
 ARG HELM_VERSION="3.7.1"
-ARG KUBECTL_VERSION="1.22.2"
 RUN \
-  su vscode -c "go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v${PROTOC_GEN_GO_GRPC}" && \
-  su vscode -c "go install github.com/envoyproxy/protoc-gen-validate@v${PROTOC_GEN_VALIDATE}" && \
-  su vscode -c "go install google.golang.org/protobuf/cmd/protoc-gen-go@v${PROTOC_GEN_GO}" && \
-  su vscode -c "go install storj.io/drpc/cmd/protoc-gen-go-drpc@v${PROTOC_GEN_DRPC}" && \
-  # goimports
-  su vscode -c "go get golang.org/x/tools/cmd/goimports" && \
   # helm
   curl -sSL https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz -o helm.tgz && \
   tar -xvzf helm.tgz && \
   mv linux-amd64/helm /usr/local/bin/. && \
-  rm -rf linux-amd64 helm.tgz && \
+  rm -rf linux-amd64 helm.tgz
+
+# kubectl
+ARG KUBECTL_VERSION="1.22.2"
+RUN \
   # kubectl
-  curl -sLO https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl && \
+  curl -sSL https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o kubectl && \
   chmod +x kubectl && \
   mv kubectl /usr/local/bin/.
+
+# additional tools
+ARG NANCY_VERSION="1.0.26"
+ARG GQLGEN_VERSION="0.14.0"
+RUN \
+  # goimports
+  su vscode -c "go get golang.org/x/tools/cmd/goimports" && \
+  # nancy
+  curl -sSL https://github.com/sonatype-nexus-community/nancy/releases/download/v${NANCY_VERSION}/nancy-v${NANCY_VERSION}-linux-amd64 -o /usr/local/bin/nancy && \
+  chmod +x /usr/local/bin/nancy && \
+  # gqlgen
+  su vscode -c "go install github.com/99designs/gqlgen@v${GQLGEN_VERSION}"
