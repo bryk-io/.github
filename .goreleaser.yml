@@ -45,6 +45,20 @@ builds:
 archives:
   # a single project can produce multiple archives
   - name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    builds:
+      # artifacts to pack
+      - my-app
+    format_overrides:
+      # use zip file instead of 'tar.gz' on Windows systems
+      - goos: windows
+        format: zip
+    files:
+      # include documentation files in the package for distribution
+      - README.md
+      - LICENSE*
+      - src: '*.md'
+        dst: docs
+        strip_parent: true
 # generate integrity checksums
 # https://goreleaser.com/customization/checksum/
 checksum:
@@ -54,6 +68,20 @@ checksum:
 # https://goreleaser.com/customization/source/
 source:
   enabled: true
+# configure the 'CHANGELOG.md' file produced
+# https://goreleaser.com/customization/release/#customize-the-changelog
+changelog:
+  # Sorts the changelog by the commit messages (asc, desc or '')
+  sort: ''
+  # Remove certain commit messages from the changelog
+  filters:
+    # Standard commit messages can help to produce better changelogs
+    # https://www.conventionalcommits.org/en/v1.0.0/
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+      - "^typo:"
 # produce test releases
 # https://goreleaser.com/customization/snapshots/
 snapshot:
@@ -88,20 +116,6 @@ dockers:
     skip_push: auto
     # Additional files to add/copy into the container image
     extra_files: []
-# configure the 'CHANGELOG.md' file produced
-# https://goreleaser.com/customization/release/#customize-the-changelog
-changelog:
-  # Sorts the changelog by the commit's messages (asc, desc or '')
-  sort: ''
-  # Remove certain commit messages from the changelog
-  filters:
-    # Standard commit messages can help to produce better changelogs
-    # https://www.conventionalcommits.org/en/v1.0.0/
-    exclude:
-      - "^docs:"
-      - "^test:"
-      - "^chore:"
-      - "^typo:"
 # Produce homebrew formulas for the project artifacts
 # https://goreleaser.com/customization/homebrew/
 brews:
@@ -132,3 +146,36 @@ brews:
       prefix.install_metafiles
     test: |
       system "#{bin}/my-app version"
+# linux packages
+# https://goreleaser.com/customization/nfpm/
+nfpms:
+  -
+    file_name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+    builds:
+      - my-app
+    vendor: Bryk Labs
+    homepage: https://github.com/bryk-io/my-app
+    maintainer: Ben Cessa <ben@bryk.io>
+    description: A short but meaningful description for your app.
+    license: BSD-3-Clause
+    formats:
+      # Alpine
+      - apk
+      # Debian based distributions
+      - deb
+      # RedHat based distributions
+      - rpm
+    # Binary location
+    bindir: /usr/local/bin
+    # Folders created and managed by the installer
+    empty_folders:
+      - /etc/my-app
+    # Additional files managed by the installer
+    contents:
+      - src: sample-config.yaml
+        dst: /etc/my-app/config.yaml
+        type: "config|noreplace"
+        file_info:
+          mode: 0644
+          group: root
+
