@@ -23,7 +23,7 @@ jobs:
     steps:
       # Checkout code
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       
       # Deploy chart
       # https://github.com/bryk-io/chart-deploy-action#without-environments

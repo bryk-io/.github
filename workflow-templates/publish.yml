@@ -13,9 +13,9 @@ jobs:
     steps:
       # Go
       - name: Set up Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
-          go-version: 1.17.x
+          go-version: 1.18.x
 
       # Checkout code
       - name: Checkout repository
@@ -34,9 +34,9 @@ jobs:
       # If "vendor" is in cache, restore.
       # To run conditional steps use:
       # if: steps.vendor-cache.outputs.cache-hit != 'true'
-      - name: Restore vendor from cache
+      - name: Restore modules from cache
         id: vendor-cache
-        uses: actions/cache@v2.1.7
+        uses: actions/cache@v3.0.2
         env:
           cache-name: vendor
         with:

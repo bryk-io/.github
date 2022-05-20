@@ -24,9 +24,9 @@ jobs:
     steps:
       # Go
       - name: Set up Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
-          go-version: 1.17.x
+          go-version: 1.18.x
 
       # Checkout code
       - name: Checkout repository
@@ -41,13 +41,13 @@ jobs:
 
       # List direct dependencies
       - name: List dependencies
-        run: go list -f '{{if not .Indirect}}{{.}}{{end}}' -m all > go.list
+        run: go list -mod=readonly -f '{{if not .Indirect}}{{.}}{{end}}' -m all > go.list
 
       # Scan dependencies using Nancy
       # https://github.com/sonatype-nexus-community/nancy-github-action
       - name: Scan dependencies
-        uses: sonatype-nexus-community/nancy-github-action@main
-
+        uses: sonatype-nexus-community/nancy-github-action@v1.0.2
+  
   # Validate the protocol buffer definitions on the project
   # using 'buf'. Remove if not required.
   protos:
@@ -57,9 +57,9 @@ jobs:
     steps:
       # Go
       - name: Set up Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
-          go-version: 1.17.x
+          go-version: 1.18.x
 
       # Checkout code
       - name: Checkout repository
@@ -82,10 +82,10 @@ jobs:
       # Setup buf
       - name: Setup buf
         id: buf-setup
-        uses: bufbuild/buf-setup-action@v1.1.0
+        uses: bufbuild/buf-setup-action@v1.4.0
         with:
-          version: '1.1.0'
-          github_token: ${{ secrets.ACCESS_TOKEN }}
+          version: '1.2.1'
+          github_token: ${{ github.token }}
 
       # Static analysis
       - name: Static analysis
@@ -111,14 +111,14 @@ jobs:
     needs: protos
     strategy:
       matrix:
-        go-version: [1.15.x, 1.16.x, 1.17.x]
+        go-version: [1.16.x, 1.17.x, 1.18.x]
         os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15
     steps:
       # Go
       - name: Set up Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
           go-version: ${{ matrix.go-version }}
 
@@ -126,7 +126,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Prepare runner environment
+      # Configure runner environment
       - name: Set up runner environment
         run: ./.github/workflows/assets/utils.sh setup
         env:
@@ -136,9 +136,9 @@ jobs:
       # If "vendor" is in cache, restore.
       # To run conditional steps use:
       # if: steps.vendor-cache.outputs.cache-hit != 'true'
-      - name: Restore vendor from cache
+      - name: Restore modules from cache
         id: vendor-cache
-        uses: actions/cache@v2.1.7
+        uses: actions/cache@v3.0.2
         env:
           cache-name: vendor
         with:
@@ -148,7 +148,7 @@ jobs:
       # Style consistency and static analysis using 'golangci-lint'
       # https://github.com/marketplace/actions/run-golangci-lint
       - name: Static analysis
-        uses: golangci/golangci-lint-action@v3.1.0
+        uses: golangci/golangci-lint-action@v3.2.0
         with:
           version: latest
 
@@ -158,11 +158,11 @@ jobs:
 
       # Ensure project compile and build successfully
       - name: Build
-        run: make build-for os=linux arch=amd64
+        run: make build
 
       # Save artifacts
       - name: Save artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: assets
           path: |
