@@ -24,7 +24,7 @@ LD_FLAGS += -X main.buildCode=$(GIT_COMMIT_HASH)
 # locally (on a dev container) or using a builder image.
 buf:=buf
 ifndef REMOTE_CONTAINERS_SOCKETS
-	buf=docker run --platform linux/amd64 --rm -it -v $(shell pwd):/workdir ghcr.io/bryk-io/buf-builder:1.5.0 buf
+	buf=docker run --platform linux/amd64 --rm -it -v $(shell pwd):/workdir ghcr.io/bryk-io/buf-builder:1.7.0 buf
 endif
 
 help:
@@ -53,11 +53,8 @@ ca-roots:
 
 ## deps: Download and compile all dependencies and intermediary products
 deps:
-	@-rm -rf vendor
+	go clean
 	go mod tidy
-	GOWORK=off go mod verify
-	go mod download
-	go mod vendor
 
 ## docs: Display package documentation on local server
 docs:
@@ -107,6 +104,9 @@ proto-build:
 
 	# Generate package code using buf.gen.yaml
 	$(buf) generate --output proto --path proto/$(pkg)
+
+	# Add compiler version to generated files
+	@-sed -i.bak 's/(unknown)/buf-v$(shell buf --version)/g' proto/$(pkg)/*.pb.go
 
 	# Remove package comment added by the gateway generator to avoid polluting
 	# the package documentation.

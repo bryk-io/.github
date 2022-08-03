@@ -24,9 +24,9 @@ updates:
       # Prefix all commit messages with "dependencies"
       prefix: "dependencies"
     # Ignore specific dependencies
-    ignore: []
-      # - dependency-name: "google.golang.org/genproto"
-  # Github Actions
+    ignore:
+      - dependency-name: "google.golang.org/genproto"
+  # GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
