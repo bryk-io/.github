@@ -5,7 +5,7 @@ on:
       - '*'
   pull_request:
     branches:
-      - master
+      - main
   workflow_dispatch: {}
 jobs:
   # Semantic code analysis to discover vulnerabilities in the codebase
@@ -30,8 +30,17 @@ jobs:
           GITHUB_USER: ${{ github.actor }}
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
 
+      # Get commit message
+      - name: Get commit message
+        run: |
+          echo 'commit_msg<<EOF' >> $GITHUB_ENV
+          git log --format=%B -n 1 ${{ github.sha }} >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
+
       # Initializes the CodeQL tools for scanning.
       - name: Initialize CodeQL
+        id: codeql-initialize
+        if: ! contains(env.commit_msg, '[skip codeql]')
         uses: github/codeql-action/init@v2
         with:
           languages: ${{ matrix.language }}
@@ -42,15 +51,20 @@ jobs:
 
       # Auto build attempts to build any compiled languages  (C/C++, C#, or Java).
       - name: Auto build
+        id: codeql-autobuild
+        if: ! contains(env.commit_msg, '[skip codeql]')
         uses: github/codeql-action/autobuild@v2
 
       # Run manual build only if auto-build fails
       - name: Manual build
-        if: ${{ failure() }}
+        id: codeql-build
+        if: ${{ failure() }} && ! contains(env.commit_msg, '[skip codeql]')
         run: |
           make bootstrap
           make release
 
       # Run analysis
       - name: Perform CodeQL analysis
+        id: codeql-analyze
+        if: ! contains(env.commit_msg, '[skip codeql]')
         uses: github/codeql-action/analyze@v2

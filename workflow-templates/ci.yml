@@ -2,12 +2,10 @@ name: ci
 on:
   push:
     branches:
-      - master
-    tags:
-      - v*
+      - main
   pull_request:
     branches:
-      - master
+      - main
   workflow_dispatch: {}
 #    Inputs are available under: github.event.inputs.{name}
 #    inputs:
@@ -26,7 +24,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18.x
+          go-version: 1.19.x
 
       # Checkout code
       - name: Checkout repository
@@ -69,7 +67,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18.x
+          go-version: 1.19.x
 
       # Checkout code
       - name: Checkout repository
@@ -92,22 +90,22 @@ jobs:
       # Setup buf
       - name: Setup buf
         id: buf-setup
-        uses: bufbuild/buf-setup-action@v1.7.0
+        uses: bufbuild/buf-setup-action@v1.9.0
         with:
-          version: 1.7.0
+          version: 1.9.0
           github_token: ${{ github.token }}
 
       # Static analysis
       - name: Static analysis
         id: buf-lint
-        uses: bufbuild/buf-lint-action@v1.0.1
+        uses: bufbuild/buf-lint-action@v1.0.3
         if: ${{ steps.buf-setup.outcome == 'success' }}
 
       # Detect breaking changes
       - name: Detect breaking changes
         id: buf-breaking
-        uses: bufbuild/buf-breaking-action@v1.1.0
-        if: steps.buf-lint.outcome == 'success' && !contains(env.commit_msg, '[buf-breaking skip]')
+        uses: bufbuild/buf-breaking-action@v1.1.2
+        if: steps.buf-lint.outcome == 'success' && !contains(env.commit_msg, '[skip buf-breaking]')
         with:
           against: 'https://github.com/${{ github.repository }}.git#branch=master'
         env:
@@ -121,7 +119,7 @@ jobs:
     needs: protos
     strategy:
       matrix:
-        go-version: [1.17.x, 1.18.x]
+        go-version: [1.17.x, 1.18.x, 1.19.x]
         os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15

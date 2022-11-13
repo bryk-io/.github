@@ -3,13 +3,7 @@ run:
   issues-exit-code: 1
   tests: true
   build-tags: []
-  skip-dirs:
-    - vendor$
-    - third_party$
-    - testdata$
-    - examples$
-    - Godeps$
-    - builtin$
+  skip-dirs-use-default: true
   skip-files:
     - ".*\\.pb\\.go$"
     - ".*\\.pb\\.gw\\.go$"
@@ -28,9 +22,7 @@ linters:
     - gofmt
     - ineffassign
     - staticcheck
-    - structcheck
     - typecheck
-    - varcheck
     - gocyclo
     - goconst
     - depguard
@@ -49,19 +41,23 @@ linters:
     - exhaustive
     - forcetypeassert
     - godot
-    - ifshort
     - noctx
     - predeclared
     - exportloopref
-    - wastedassign
     - whitespace
-    - funlen
-    - nestif
+    # Deprecated linters
+    #- wrapcheck
+    #- nestif
+    #- funlen
+    #- ifshort
+    #- varcheck
+  disable:
     - deadcode
     - unused
-    #- wrapcheck
-  disable:
     - dupl
+    # https://github.com/golangci/golangci-lint/issues/2649
+    - structcheck
+    - wastedassign
 issues:
   exclude-use-default: false
   exclude-rules:
@@ -87,6 +83,7 @@ linters-settings:
       - atomicalign
       - buildtag
       - cgocall
+      - composites
       - copylocks
       - httpresponse
       - loopclosure
@@ -99,7 +96,6 @@ linters-settings:
       - unusedresult
       - tests
       #- fieldalignment
-      #- composites
   gofmt:
     simplify: true
   gocyclo:
@@ -124,9 +120,9 @@ linters-settings:
     range-loops: true
     for-loops: false
   dupl:
-    threshold: 110
+    threshold: 150
   exhaustive:
     default-signifies-exhaustive: true
   funlen:
-    lines: 120
+    lines: 90
     statements: 70

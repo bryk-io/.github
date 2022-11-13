@@ -1,5 +1,9 @@
 name: deploy
 on:
+  # automatically deploy on every new release
+  release:
+    types:
+      - published
   # To manually deploy the workflow. For example, using CLI:
   # gh workflow run deploy -f name=my-app -f namespace=dev
   workflow_dispatch:
@@ -28,10 +32,10 @@ jobs:
       # Deploy chart
       # https://github.com/bryk-io/chart-deploy-action#without-environments
       - name: Helm chart deployment
-        uses: bryk-io/chart-deploy-action@v1.0.0
+        uses: bryk-io/chart-deploy-action@v1.2.0
         with:
-          name: ${{ github.event.inputs.name }}
-          namespace: ${{ github.event.inputs.namespace }}
+          name: ${{ github.event.inputs.name || 'kokua-backend' }}
+          namespace: ${{ github.event.inputs.namespace || 'production' }}
           version: ${{ github.event.inputs.version }}
         env:
           KUBECTL_CONFIG: ${{ secrets[format('kubectl_config_{0}', github.event.inputs.namespace)] }}
