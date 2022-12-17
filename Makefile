@@ -24,7 +24,7 @@ LD_FLAGS += -X main.buildCode=$(GIT_COMMIT_HASH)
 # locally (on a dev container) or using a builder image.
 buf:=buf
 ifndef REMOTE_CONTAINERS_SOCKETS
-	buf=docker run --platform linux/amd64 --rm -it -v $(shell pwd):/workdir ghcr.io/bryk-io/buf-builder:1.9.0 buf
+	buf=docker run --platform linux/amd64 --rm -it -v $(shell pwd):/workdir ghcr.io/bryk-io/buf-builder:1.10.0 buf
 endif
 
 help:
@@ -85,8 +85,13 @@ install:
 lint:
 	golangci-lint run -v ./...
 
-## proto-test: Verify PB definitions on 'pkg'
+## protos: Compile all protobuf definitions and RPC services
+protos:
+	# Generate package images and code
+	make proto-build pkg=sample/v1
+
 proto-test:
+	## proto-test: Verify PB definitions on 'pkg'
 	# Verify style and consistency
 	$(buf) lint --path proto/$(pkg)
 
@@ -94,8 +99,8 @@ proto-test:
 	# use `buf build --o proto/$(pkg)/image.bin --path proto/$(pkg)` to generate it.
 	$(buf) breaking --against proto/$(pkg)/image.bin
 
-## proto-build: Build PB definitions on 'pkg'
 proto-build:
+	## proto-build: Build PB definitions on 'pkg'
 	# Verify PB definitions
 	make proto-test pkg=$(pkg)
 
@@ -130,16 +135,15 @@ release:
 ## scan-deps: Look for known vulnerabilities in the project dependencies
 # https://github.com/sonatype-nexus-community/nancy
 scan-deps:
-	@go list -mod=readonly -f '{{if not .Indirect}}{{.}}{{end}}' -m all | nancy sleuth --skip-update-check
+	@go list -json -deps ./... | nancy sleuth --skip-update-check
 
 ## scan-secrets: Scan project code for accidentally leaked secrets
+# https://github.com/trufflesecurity/trufflehog
 scan-secrets:
-	@docker run --platform linux/amd64 --rm \
-	-v $(shell pwd):/proj \
-	dxa4481/trufflehog file:///proj \
-	-x .exclude-secrets-scan.txt \
-	--regex \
-	--entropy false
+	@docker run -it --rm --platform linux/arm64 \
+	-v "$PWD:/repo" \
+	trufflesecurity/trufflehog:latest \
+	filesystem --directory /repo --only-verified
 
 ## test: Run unit tests excluding the vendor dependencies
 test:
