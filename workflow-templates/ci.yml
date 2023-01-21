@@ -49,11 +49,11 @@ jobs:
         run: go list -mod=readonly -f '{{if not .Indirect}}{{.}}{{end}}' -m all > go.list
 
       # Scan dependencies using Nancy
-      # Can be excluded if the commit message contains: [scan-deps skip]
+      # Can be excluded if the commit message contains: [skip scan-deps]
       # https://github.com/sonatype-nexus-community/nancy-github-action
       - name: Scan dependencies
         id: scan-deps
-        if: ${{ !contains(env.commit_msg, '[scan-deps skip]') }}
+        if: ${{ !contains(env.commit_msg, '[skip scan-deps]') }}
         uses: sonatype-nexus-community/nancy-github-action@v1.0.2
   
   # Validate the protocol buffer definitions on the project
@@ -105,9 +105,9 @@ jobs:
       - name: Detect breaking changes
         id: buf-breaking
         uses: bufbuild/buf-breaking-action@v1.1.2
-        if: steps.buf-lint.outcome == 'success' && !contains(env.commit_msg, '[buf-breaking skip]')
+        if: steps.buf-lint.outcome == 'success' && !contains(env.commit_msg, '[skip buf-breaking]')
         with:
-          against: 'https://github.com/${{ github.repository }}.git#branch=master'
+          against: 'https://github.com/${{ github.repository }}.git#branch=main'
         env:
           BUF_INPUT_HTTPS_USERNAME: ${{ github.actor }}
           BUF_INPUT_HTTPS_PASSWORD: ${{ secrets.ACCESS_TOKEN }}
@@ -158,7 +158,7 @@ jobs:
       - name: Static analysis
         uses: golangci/golangci-lint-action@v3
         with:
-          version: 1.50.1
+          version: v1.50.1
 
       # Run unit tests
       - name: Test

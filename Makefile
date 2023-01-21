@@ -16,9 +16,13 @@ GIT_TAG=$(shell git describe --tags --always --abbrev=0 | cut -c 1-7)
 # Linker tags
 # https://golang.org/cmd/link/
 LD_FLAGS += -s -w
-LD_FLAGS += -X main.coreVersion=$(GIT_TAG:v%=%)
-LD_FLAGS += -X main.buildTimestamp=$(GIT_COMMIT_DATE)
-LD_FLAGS += -X main.buildCode=$(GIT_COMMIT_HASH)
+LD_FLAGS += -X $(PROJECT_REPO)/internal.CoreVersion=$(GIT_TAG:v%=%)
+LD_FLAGS += -X $(PROJECT_REPO)/internal.BuildTimestamp=$(GIT_COMMIT_DATE)
+LD_FLAGS += -X $(PROJECT_REPO)/internal.BuildCode=$(GIT_COMMIT_HASH)
+
+# For commands that require a specific package path, default to all local
+# subdirectories if no value is provided.
+pkg?="..."
 
 # "buf" is used to manage protocol buffer definitions, either
 # locally (on a dev container) or using a builder image.
