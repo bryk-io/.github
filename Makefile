@@ -24,7 +24,7 @@ LD_FLAGS += -X main.buildCode=$(GIT_COMMIT_HASH)
 # locally (on a dev container) or using a builder image.
 buf:=buf
 ifndef REMOTE_CONTAINERS_SOCKETS
-	buf=docker run --platform linux/amd64 --rm -it -v $(shell pwd):/workdir ghcr.io/bryk-io/buf-builder:1.10.0 buf
+	buf=docker run --platform linux/amd64 --rm -it -v $(shell pwd):/workdir ghcr.io/bryk-io/buf-builder:1.11.0 buf
 endif
 
 help:

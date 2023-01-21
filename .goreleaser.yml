@@ -68,6 +68,7 @@ checksum:
 # https://goreleaser.com/customization/source/
 source:
   enabled: true
+  rlcp: true
 # configure the 'CHANGELOG.md' file produced
 # https://goreleaser.com/customization/release/#customize-the-changelog
 changelog:
