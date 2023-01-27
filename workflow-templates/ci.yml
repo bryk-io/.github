@@ -55,6 +55,16 @@ jobs:
         id: scan-deps
         if: ${{ !contains(env.commit_msg, '[skip scan-deps]') }}
         uses: sonatype-nexus-community/nancy-github-action@v1.0.2
+      
+      # Scan for leaked secrets
+      # https://github.com/marketplace/actions/trufflehog-oss
+      - name: Scan for leaked secrets
+        uses: trufflesecurity/trufflehog@main
+        if: ${{ !contains(env.commit_msg, '[skip scan-secrets]') }}
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          extra_args: --debug --only-verified
   
   # Validate the protocol buffer definitions on the project
   # using 'buf'. Remove if not required.
