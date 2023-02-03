@@ -52,14 +52,14 @@ jobs:
       # Can be excluded if the commit message contains: [skip scan-deps]
       # https://github.com/sonatype-nexus-community/nancy-github-action
       - name: Scan dependencies
-        id: scan-deps
         if: ${{ !contains(env.commit_msg, '[skip scan-deps]') }}
         uses: sonatype-nexus-community/nancy-github-action@v1.0.2
       
       # Scan for leaked secrets
+      # Can be excluded if the commit message contains: [skip scan-secrets]
       # https://github.com/marketplace/actions/trufflehog-oss
       - name: Scan for leaked secrets
-        uses: trufflesecurity/trufflehog@main
+        uses: trufflesecurity/trufflehog@v3.26.0
         if: ${{ !contains(env.commit_msg, '[skip scan-secrets]') }}
         with:
           path: ./
@@ -112,12 +112,13 @@ jobs:
         if: ${{ steps.buf-setup.outcome == 'success' }}
 
       # Detect breaking changes
+      # Can be excluded if the commit message contains: [skip buf-breaking]
       - name: Detect breaking changes
         id: buf-breaking
         uses: bufbuild/buf-breaking-action@v1.1.2
         if: steps.buf-lint.outcome == 'success' && !contains(env.commit_msg, '[skip buf-breaking]')
         with:
-          against: 'https://github.com/${{ github.repository }}.git#branch=main'
+          against: 'https://github.com/${{ github.repository }}.git#branch=${{ github.event.repository.default_branch }}'
         env:
           BUF_INPUT_HTTPS_USERNAME: ${{ github.actor }}
           BUF_INPUT_HTTPS_PASSWORD: ${{ secrets.ACCESS_TOKEN }}
@@ -150,6 +151,13 @@ jobs:
         env:
           GITHUB_USER: ${{ github.actor }}
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+
+      # Get commit message
+      - name: Get commit message
+        run: |
+          echo 'commit_msg<<EOF' >> $GITHUB_ENV
+          git log --format=%B -n 1 ${{ github.sha }} >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
 
       # If "vendor" is in cache, restore.
       # To run conditional steps use:
