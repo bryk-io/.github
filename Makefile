@@ -28,7 +28,7 @@ pkg?="..."
 # locally (on a dev container) or using a builder image.
 buf:=buf
 ifndef REMOTE_CONTAINERS_SOCKETS
-	buf=docker run --platform linux/amd64 --rm -it -v $(shell pwd):/workdir ghcr.io/bryk-io/buf-builder:1.11.0 buf
+	buf=docker run --platform linux/amd64 --rm -it -v $(shell pwd):/workdir ghcr.io/bryk-io/buf-builder:1.15.1 buf
 endif
 
 help:
@@ -115,7 +115,7 @@ proto-build:
 	$(buf) generate --output proto --path proto/$(pkg)
 
 	# Add compiler version to generated files
-	@-sed -i.bak 's/(unknown)/buf-v$(shell buf --version)/g' proto/$(pkg)/*.pb.go
+	@-sed -i.bak 's/(unknown)/buf-v$(shell $(buf) --version)/g' proto/$(pkg)/*.pb.go
 
 	# Remove package comment added by the gateway generator to avoid polluting
 	# the package documentation.
