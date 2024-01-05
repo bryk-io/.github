@@ -1,4 +1,10 @@
 name: ci
+env:
+  commit_msg: ""
+permissions:
+  contents: read
+  # allow the actions to annotate code in a PR
+  checks: write
 on:
   push:
     branches:
@@ -22,7 +28,7 @@ jobs:
     steps:
       # Checkout code
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Configure runner environment
       - name: Set up runner environment
@@ -33,7 +39,7 @@ jobs:
 
       # Go
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: 1.21.x
 
@@ -53,13 +59,13 @@ jobs:
       # https://github.com/sonatype-nexus-community/nancy-github-action
       - name: Scan dependencies
         if: ${{ !contains(env.commit_msg, '[skip scan-deps]') }}
-        uses: sonatype-nexus-community/nancy-github-action@v1.0.2
+        uses: sonatype-nexus-community/nancy-github-action@v1.0.3
 
       # Scan for leaked secrets
       # Can be excluded if the commit message contains: [skip scan-secrets]
       # https://github.com/marketplace/actions/trufflehog-oss
       - name: Scan for leaked secrets
-        uses: trufflesecurity/trufflehog@v3.26.0
+        uses: trufflesecurity/trufflehog@v3.63.7
         if: ${{ !contains(env.commit_msg, '[skip scan-secrets]') }}
         with:
           path: ./
@@ -75,7 +81,7 @@ jobs:
     steps:
       # Checkout code
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Configure runner environment
       - name: Set up runner environment
@@ -86,7 +92,7 @@ jobs:
 
       # Go
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: 1.21.x
 
@@ -100,9 +106,9 @@ jobs:
       # Setup buf
       - name: Setup buf
         id: buf-setup
-        uses: bufbuild/buf-setup-action@v1.17.0
+        uses: bufbuild/buf-setup-action@v1.28.1
         with:
-          version: 1.17.0
+          version: 1.28.1
           github_token: ${{ github.token }}
 
       # Static analysis
@@ -118,7 +124,7 @@ jobs:
         uses: bufbuild/buf-breaking-action@v1.1.2
         if: ${{ steps.buf-lint.outcome == 'success' && !contains(env.commit_msg, '[skip buf-breaking]') }}
         with:
-          against: 'https://github.com/${{ github.repository }}.git#branch=${{ github.event.repository.default_branch }}'
+          against: "https://github.com/${{ github.repository }}.git#branch=${{ github.event.repository.default_branch }}"
         env:
           BUF_INPUT_HTTPS_USERNAME: ${{ github.actor }}
           BUF_INPUT_HTTPS_PASSWORD: ${{ secrets.ACCESS_TOKEN }}
@@ -137,7 +143,7 @@ jobs:
     steps:
       # Checkout code
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Configure runner environment
       - name: Set up runner environment
@@ -148,7 +154,7 @@ jobs:
 
       # Go
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go-version }}
 
@@ -164,7 +170,7 @@ jobs:
       - name: Static analysis
         uses: golangci/golangci-lint-action@v3
         with:
-          version: v1.51.2
+          version: v1.54.2
 
       # Run unit tests
       - name: Test
@@ -176,8 +182,8 @@ jobs:
 
       # Save artifacts
       - name: Save artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: assets
           path: |
-            coverage.html
+            coverage-${{ matrix.go-version }}.html

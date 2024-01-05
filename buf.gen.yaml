@@ -6,8 +6,8 @@ managed:
   cc_enable_arenas: false
   java_multiple_files: true
   # go_package_prefix:
-  #   # <module_name>   : name in go.mod 
-  #   # <relative_path> : generated code output 
+  #   # <module_name>   : name in go.mod
+  #   # <relative_path> : generated code output
   #   # default: <module_name>/<relative_path>
   #   except:
   #     - buf.build/googleapis/googleapis
@@ -21,7 +21,6 @@ plugins:
     out: .
     opt:
       - paths=source_relative
-  # buf.build/grpc/go:v1.2.0
   - plugin: go-grpc
     out: .
     opt:
