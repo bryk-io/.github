@@ -1,0 +1,8 @@
+{
+  "name": "OSSF Scorecard",
+  "description": "Ensure OSSF best practices are followed.",
+  "iconName": "security",
+  "categories": [
+    "Security"
+  ]
+}

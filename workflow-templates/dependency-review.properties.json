@@ -1,0 +1,8 @@
+{
+  "name": "Dependency review",
+  "description": "Scan dependency manifest files for security vulnerabilities.",
+  "iconName": "security",
+  "categories": [
+    "Security"
+  ]
+}

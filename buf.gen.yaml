@@ -1,45 +1,40 @@
-version: v1
-# https://docs.buf.build/generate/managed-mode
+version: v2
+inputs:
+  - directory: proto
 managed:
   enabled: true
-  optimize_for: SPEED
-  cc_enable_arenas: false
-  java_multiple_files: true
-  # go_package_prefix:
-  #   # <module_name>   : name in go.mod
-  #   # <relative_path> : generated code output
-  #   # default: <module_name>/<relative_path>
-  #   except:
-  #     - buf.build/googleapis/googleapis
-# For each plugin:
-#   - plugin: buf generate will look for a binary named protoc-gen-NAME
-#   - out: path relative to the output directory
-#   - opt: options to provide to the plugin
+  override:
+    - file_option: go_package_prefix
+      value: go.bryk.io/pkg
+  disable:
+    - file_option: go_package
+      module: buf.build/bufbuild/protovalidate
+    - file_option: go_package_prefix
+      module: buf.build/googleapis/googleapis
+    - file_option: go_package_prefix
+      module: buf.build/grpc-ecosystem/grpc-gateway
 plugins:
-  # buf.build/protocolbuffers/go:v1.28.1
-  - plugin: go
+  # ! with >=v1.36.4 the pb.go files generated break when using the
+  # ! protoc_gen_openapiv2 annotations.
+  - remote: buf.build/protocolbuffers/go:v1.36.3
     out: .
     opt:
       - paths=source_relative
-  - plugin: go-grpc
+  - remote: buf.build/grpc/go:v1.5.1
     out: .
     opt:
       - paths=source_relative
       - require_unimplemented_servers=true
-  - plugin: grpc-gateway
+  - remote: buf.build/grpc-ecosystem/openapiv2:v2.27.1
+    out: .
+    opt:
+      - logtostderr=true
+  - remote: buf.build/grpc-ecosystem/gateway:v2.27.1
     out: .
     opt:
       - paths=source_relative
       - logtostderr=true
-  - plugin: openapiv2
-    out: .
-    opt:
-      - logtostderr=true
-  - plugin: validate
-    out: .
-    opt:
-      - lang=go
-  - plugin: go-drpc
-    out: .
-    opt:
-      - paths=source_relative
+  # - local: go-drpc
+  #   out: .
+  #   opt:
+  #     - paths=source_relative

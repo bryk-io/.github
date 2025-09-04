@@ -1,4 +1,4 @@
-FROM ghcr.io/bryk-io/shell:0.2.0
+FROM ghcr.io/bryk-io/shell:stable
 
 # Expose required ports
 EXPOSE 9090

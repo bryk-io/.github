@@ -1,4 +1,5 @@
 name: deploy
+permissions: read-all
 on:
   # automatically deploy on every new release
   release:
@@ -9,30 +10,36 @@ on:
   workflow_dispatch:
     inputs:
       name:
-        description: 'Deployment name'
+        description: "Deployment name"
         required: true
-        default: 'my-app'
+        default: "my-app"
       namespace:
-        description: 'Kubernetes namespace'
+        description: "Kubernetes namespace"
         required: true
       version:
-        description: 'Application version to deploy (used as image tag)'
+        description: "Application version to deploy (used as image tag)"
         required: false
-        default: ''
+        default: ""
 jobs:
   deploy:
     name: run deployment
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      # Harden workflow runner
+      - name: Harden workflow runner (audit all outbound calls)
+        uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
+        with:
+          egress-policy: audit
+
       # Checkout code
       - name: Checkout repository
-        uses: actions/checkout@v3
-      
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
       # Deploy chart
       # https://github.com/bryk-io/chart-deploy-action#without-environments
       - name: Helm chart deployment
-        uses: bryk-io/chart-deploy-action@v1.2.0
+        uses: bryk-io/chart-deploy-action@27ec65b81a6e4b37ef099b02976df1b4200c1a21 # v1.2.0
         with:
           name: ${{ github.event.inputs.name || 'kokua-backend' }}
           namespace: ${{ github.event.inputs.namespace || 'production' }}
